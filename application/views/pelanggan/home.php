@@ -4,7 +4,6 @@
 			<div class="card">
 				<div class="card-body">
 					<h5 class="card-title inline-block">Data Pelanggan</h5>
-					<!-- <p id="showKey"></p> -->
 					<input type="search" id="keyword" name="keyword"
 						placeholder="Global Search..." 
 						style="width: 780px;" 
@@ -30,14 +29,16 @@
 		document.getElementById('gs_hp').value     = '';
 		document.getElementById('gs_email').value  = '';
 		document.getElementById('gs_alamat').value = '';
-		$.ajax({
-			type: "GET",
-			url: "<?= base_url() ?>home/get-data?_search=true&global_search="+value+"&rows=10&page=1&sidx=&sord=asc",
-			dataType: "text",
-			success: function (result) {
-				
-			}
-		});
+		$("#jqGrid").jqGrid('setGridParam', {
+			url: "<?= base_url() ?>home/get-data",
+			editurl: 'clientArray',
+			mtype: "GET",
+			datatype: 'json',
+				postData: {
+					filters: '{"groupOp":"OR","rules":[{"field":"nama","op":"in","data":"'+value+'"},{"field":"nik","op":"in","data":"'+value+'"},{"field":"hp","op":"in","data":"'+value+'"},{"field":"email","op":"in","data":"'+value+'"},{"field":"alamat","op":"in","data":"'+value+'"}]}'
+				},
+				search: true,
+		}).trigger('reloadGrid');
 	});
 	
 	$(document).ready(function () {

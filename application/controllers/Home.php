@@ -23,31 +23,24 @@ class Home extends CI_Controller {
 		$sidx  = isset($_GET['sidx'])?$_GET['sidx']:'id';  //field index
 		$sord  = isset($_GET['sord'])?$_GET['sord']:'';    // default = asc
 
-		$search        = (isset($_GET['_search']) ? $_GET['_search'] : false);
-		$global_search = (isset($_GET['global_search']) ? $_GET['global_search'] : false);
-		$filters       = (isset($_GET['filters']) ? json_decode($_GET['filters'], true) : false);
-		$rules         = ($search == 'true' ? $filters['rules'] : false);
+		$search  = (isset($_GET['_search']) ? $_GET['_search'] : false);
+		$filters = (isset($_GET['filters']) ? json_decode($_GET['filters'], true) : false);
+		$rules   = ($search == 'true' ? $filters['rules'] : false);
 
 		$where  = [];
 
 		if ($search == 'true') {
 
-			if(!$global_search){
-				foreach($rules as $rule){
-	
-					$field     = $rule['field'];
-					$ops       = "LIKE";
-					$searchstr = $rule['data'];
-					$searchstr = '%'.$searchstr.'%';
-					
-					$where[] = "$field $ops '$searchstr' ";
-				}
-				$where = implode(" AND ", $where);
-			}elseif($global_search){
-				$value = '%'.$global_search.'%';
-				$where = " nama LIKE '".$value."' OR nik LIKE '".$value."' OR hp LIKE '".$value."' OR email LIKE '".$value."' OR alamat LIKE '".$value."' ";
-			}
+			foreach($rules as $rule){
 
+				$field     = $rule['field'];
+				$ops       = "LIKE";
+				$searchstr = $rule['data'];
+				$searchstr = '%'.$searchstr.'%';
+				
+				$where[] = "$field $ops '$searchstr' ";
+			}
+			$where = implode($filters['groupOp']." ", $where);
         }
 				
 		$start = $limit*$page - $limit;
