@@ -58,7 +58,7 @@ class Home extends CI_Controller {
 		$i = 0;
 		foreach($result as $row) {
 			$data['rows'][$i]['id']=$row->id;
-			$data['rows'][$i]['cell']=array($row->nama, $row->nik, $row->hp, $row->email, $row->alamat);
+			$data['rows'][$i]['cell']=array($row->id, $row->nama, $row->nik, $row->hp, $row->email, $row->alamat);
 			$i++;
 		}
 		
