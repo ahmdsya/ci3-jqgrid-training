@@ -103,4 +103,23 @@ class Home extends CI_Controller {
 		return true;
 		// return json_encode($_POST);
 	}
+
+	
+	//proses untuk tabel pesanan
+	public function get_all_pesanan()
+	{
+		$pelanggan_id = (isset($_GET['pelanggan_id']) ? $_GET['pelanggan_id'] : 0);
+
+		$data  = $this->m->get_all_pesanan($pelanggan_id);
+		$total = $this->m->sum_total_harga($pelanggan_id);
+
+		$return = [
+			'userdata' => $total,
+			'rows'     => $data
+		];
+
+		echo json_encode($return);
+
+		// echo $pelanggan_id;
+	}
 }

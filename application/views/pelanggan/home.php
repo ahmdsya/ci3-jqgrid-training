@@ -11,6 +11,12 @@
 					<table id="jqGrid"></table>
 					<div id="jqGridPager"></div>
 					<div id="delDialog"></div>
+					
+					<br><br>
+
+					<table id="jqGridDetails"></table>
+					<div id="jqGridPagerDetails"></div>
+
 					<div class="mt-2">
 						<!-- <input type="button" value="Select row  with ID 1" onclick="selectRow()" /> -->
 						<!-- <button id="exportExcel" class="btn btn-sm btn-success">Export To Excel</button>
@@ -25,6 +31,14 @@
 <script>
 	
 	$(document).ready(function () {
+
+		// var template = "<div style='margin-left:15px;'><div> Nama Lengkap <sup>*</sup>:</div><div> {nama} </div>";
+		// template += "<div> NIK: </div><div>{nik} </div>";
+		// template += "<div> Phone: </div><div>{hp} </div>";
+		// template += "<div> Email: </div><div>{email} </div>";
+		// template += "<div> Alamat:</div><div> {alamat} </div>";
+		// template += "<hr style='width:100%;'/>";
+		// template += "<div> {sData} {cData}  </div></div>";
 
 		$("#jqGrid").jqGrid({
 			url: '<?= base_url() ?>home/get-data',
@@ -119,21 +133,23 @@
 					if(event.which == 38){ //tombol atas
 						if(index >= 0){
 							$('#jqGrid').jqGrid('setSelection', ids[index = index-1]);
-							var id = $("#jqGrid").jqGrid('getGridParam', "selrow");
-							console.log(id)
 						}
 					}else if(event.which == 40){ //tombol bawah
 						if(index <= rowNum){
 							$('#jqGrid').jqGrid('setSelection', ids[index = index+1]);
-							var id = $("#jqGrid").jqGrid('getGridParam', "selrow");
-							console.log(id)
 						}
 					}
 				})
 			},
+			onSelectRow: function(rowid, selected) {
+				if(rowid != null) {
+					$("#jqGridDetails").jqGrid('setGridParam',{url: "<?= base_url() ?>home/get-all-pesanan?pelanggan_id="+rowid ,datatype: 'json'});
+					$("#jqGridDetails").trigger("reloadGrid");
+				}					
+			},
 			viewrecords: true, // show the current page, data rang and total records on the toolbar
 			width: 780,
-			height: 300,
+			height: 'auto',
 			rowNum: 10,
 			rowList: [10, 20, 30],
 			rownumbers: true,
@@ -141,6 +157,32 @@
 			gridview: true,
 			emptyrecords: 'Scroll to bottom to retrieve new page',
 			pager: "#jqGridPager",
+		});
+
+		// $("#jqGrid").jqGrid('bindKeys');
+
+		//master detail
+		var pelanggan_id = $("#jqGrid").jqGrid('getGridParam', "selrow");
+		$("#jqGridDetails").jqGrid({
+			url: '<?= base_url() ?>home/get-all-pesanan?pelanggan_id='+pelanggan_id,
+            mtype: "GET",
+            datatype: "json",
+            page: 1,
+			colModel: [
+                    { label: 'Nama Produk', name: 'nama_produk', width: 100 },
+                    { label: 'Harga', name: 'harga', width: 75 },
+                    { label: 'Kuantitas', name: 'qty', width: 50 },
+                    { label: 'Total Harga', name: 'total_harga', width: 75 },
+			],
+			width: 780,
+			rowNum: 10,
+			loadonce: true,
+			height: 'auto',
+			viewrecords: true,
+			footerrow: true,
+			userDataOnFooter: true,
+			caption: 'Data Pesanan',
+			pager: "#jqGridDetailsPager"
 		});
 
 		$('#jqGrid').jqGrid('filterToolbar', {
@@ -171,22 +213,6 @@
 			}).trigger('reloadGrid',[{page:1}]);
 		});
 
-		// document.addEventListener("keydown", function(event) {
-		// 	if(event.which == 38){
-		// 		$('#jqGrid').jqGrid('setSelection','1');
-		// 		// console.log('Tombol Atas Di Klik')
-		// 	}else if(event.which == 40){
-		// 		console.log('Tombol Bawah Di Klik')
-		// 	}
-		// })
-
-		$("#jqGrid").jqGrid('bindKeys', {
-			"onEnter" : function( rowid ) { 
-				// alert("You enter a row with id:"+rowid)
-				console.log($("#jqGrid").jqGrid('getGridParam', "selrow"))
-			}
-		});
-
 		$('#jqGrid').navGrid('#jqGridPager',
 			// the buttons to appear on the toolbar of the grid
 			{
@@ -202,9 +228,8 @@
 			// options for the Edit Dialog
 			{
 				editCaption: "The Edit Dialog",
+				// template: template,
 				recreateForm: true,
-				//checkOnUpdate : true,
-				//checkOnSubmit : true,
 				beforeSubmit: function (postdata, form, oper) {
 					// console.log(postdata)
 					$.ajax({
@@ -224,7 +249,6 @@
 			// options for the Add Dialog
 			{
 				beforeSubmit: function (postdata, form, oper) {
-					// console.log(postdata)
 					$.ajax({
 						type: "POST",
 						url: "<?= base_url() ?>home/editurl",
@@ -235,11 +259,13 @@
 					return [true, ''];
 				},
 				recreateForm: true,
+				// template: template,
 				closeAfterAdd: true,
 				errorTextFormat: function (data) {
 					return 'Error: ' + data.responseText
 				}
 			});
+			
 		
 		$('#gsh_jqGrid_rn').append(
 			'<div class="text-center"><button id="clearBtn" data-toggle="tooltip" title="Clear Search Filter!">X</button></div>'
@@ -270,12 +296,14 @@
 				var id = $("#jqGrid").jqGrid('getGridParam', "selrow");
 				// console.log(id)
 				if (id) {
+					// $("#jqGrid").jqGrid('editGridRow',id,{height:280,reloadAfterSubmit:false})
 					$("#delDialog")
 						.load('<?= base_url()?>home/get-by-id/' + id)
 						.dialog({
-							width: 500,
-							modal: true,
-							buttons: [{
+							width   : 500,
+							position: 'top',
+							modal   : true,
+							buttons : [{
 									text: "Delete",
 									click: function () {
 										$.ajax({
