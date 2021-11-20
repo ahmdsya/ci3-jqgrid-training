@@ -220,52 +220,12 @@
 				add: false,
 				del: false,
 				search: false,
-				refresh: false,
+				refresh: true,
 				view: false,
 				position: "left",
 				cloneToTop: true
-			},
-			// options for the Edit Dialog
-			{
-				editCaption: "The Edit Dialog",
-				// template: template,
-				recreateForm: true,
-				beforeSubmit: function (postdata, form, oper) {
-					// console.log(postdata)
-					$.ajax({
-						type: "POST",
-						url: "<?= base_url() ?>home/editurl",
-						data: postdata,
-						dataType: "text",
-						success: function (resultData) {}
-					});
-					return [true, ''];
-				},
-				closeAfterEdit: true,
-				errorTextFormat: function (data) {
-					return 'Error: ' + data.responseText
-				}
-			},
-			// options for the Add Dialog
-			{
-				beforeSubmit: function (postdata, form, oper) {
-					$.ajax({
-						type: "POST",
-						url: "<?= base_url() ?>home/editurl",
-						data: postdata,
-						dataType: "text",
-						success: function (resultData) {}
-					});
-					return [true, ''];
-				},
-				recreateForm: true,
-				// template: template,
-				closeAfterAdd: true,
-				errorTextFormat: function (data) {
-					return 'Error: ' + data.responseText
-				}
-			});
-			
+			}
+		);
 		
 		$('#gsh_jqGrid_rn').append(
 			'<div class="text-center"><button id="clearBtn" data-toggle="tooltip" title="Clear Search Filter!">X</button></div>'
@@ -290,7 +250,7 @@
 		//btn delete
 		$('#jqGrid').navButtonAdd('#jqGridPager', {
 			caption: "",
-			title: "delete",
+			title: "Delete",
 			buttonicon: "ui-icon-trash",
 			position: "first",
 			onClickButton: function () {
@@ -344,47 +304,51 @@
 			caption: "",
 			buttonicon: "ui-icon-pencil",
 			position: "first",
-			title: "Add",
+			title: "Update",
 			onClickButton: function () {
 				var id = $("#jqGrid").jqGrid('getGridParam', "selrow");
-				$("#Dialog")
-				.load('<?= base_url()?>home/upd-dialog/'+id)
-				.dialog({
-					width   : 'auto',
-					position: 'top',
-					modal   : true,
-					title   : "Update Data",
-					buttons : [{
-							text: "Save",
-							click: function () {
-								var data = $('#updateForm').serialize()
-								$.ajax({
-									type: "POST",
-									url: "<?= base_url() ?>home/update/"+id,
-									data: data,
-									dataType: "text",
-									success: function (resultData) {
-										// console.log(resultData)
-									}
-								});
-								$(this).dialog('close');
-								$("#jqGrid").jqGrid('setGridParam', {
-									datatype: 'json',
-									postData: {
-										filters: []
-									},
-									search: false,
-								}).trigger('reloadGrid');
+				if (id){
+					$("#Dialog")
+					.load('<?= base_url()?>home/upd-dialog/'+id)
+					.dialog({
+						width   : 'auto',
+						position: 'top',
+						modal   : true,
+						title   : "Update Data",
+						buttons : [{
+								text: "Save",
+								click: function () {
+									var data = $('#updateForm').serialize()
+									$.ajax({
+										type: "POST",
+										url: "<?= base_url() ?>home/update/"+id,
+										data: data,
+										dataType: "text",
+										success: function (resultData) {
+											// console.log(resultData)
+										}
+									});
+									$(this).dialog('close');
+									$("#jqGrid").jqGrid('setGridParam', {
+										datatype: 'json',
+										postData: {
+											filters: []
+										},
+										search: false,
+									}).trigger('reloadGrid');
+								}
+							},
+							{
+								text: "Cancel",
+								click: function () {
+									$(this).dialog('close');
+								}
 							}
-						},
-						{
-							text: "Cancel",
-							click: function () {
-								$(this).dialog('close');
-							}
-						}
-					]
-				});
+						]
+					});
+				}else {
+					alert('No selected row.')
+				}
 			}
 		});
 
