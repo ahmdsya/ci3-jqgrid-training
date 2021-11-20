@@ -6,11 +6,11 @@
 					<h5 class="card-title inline-block">Data Pelanggan</h5>
 					<input type="search" id="keyword" name="keyword"
 						placeholder="Global Search..." 
-						style="width: 780px;" 
-						class="form-control form-control-sm mb-3 mt-2">
+						style="width: 780px; height: 30px; margin-bottom: 15px;"
+						class="ui-search-input">
 					<table id="jqGrid"></table>
 					<div id="jqGridPager"></div>
-					<div id="delDialog"></div>
+					<div id="Dialog"></div>
 					
 					<br><br>
 
@@ -131,11 +131,11 @@
 				var index = 0
 				document.addEventListener("keydown", function(event) {
 					if(event.which == 38){ //tombol atas
-						if(index >= 0){
+						if(index != 0){
 							$('#jqGrid').jqGrid('setSelection', ids[index = index-1]);
 						}
 					}else if(event.which == 40){ //tombol bawah
-						if(index <= rowNum){
+						if(index != rowNum){
 							$('#jqGrid').jqGrid('setSelection', ids[index = index+1]);
 						}
 					}
@@ -216,11 +216,11 @@
 		$('#jqGrid').navGrid('#jqGridPager',
 			// the buttons to appear on the toolbar of the grid
 			{
-				edit: true,
-				add: true,
+				edit: false,
+				add: false,
 				del: false,
 				search: false,
-				refresh: true,
+				refresh: false,
 				view: false,
 				position: "left",
 				cloneToTop: true
@@ -287,22 +287,22 @@
 			}).trigger('reloadGrid');
 		});
 
+		//btn delete
 		$('#jqGrid').navButtonAdd('#jqGridPager', {
 			caption: "",
+			title: "delete",
 			buttonicon: "ui-icon-trash",
 			position: "first",
-			// id: 'btnDel',
 			onClickButton: function () {
 				var id = $("#jqGrid").jqGrid('getGridParam', "selrow");
-				// console.log(id)
 				if (id) {
-					// $("#jqGrid").jqGrid('editGridRow',id,{height:280,reloadAfterSubmit:false})
-					$("#delDialog")
-						.load('<?= base_url()?>home/get-by-id/' + id)
+					$("#Dialog")
+						.load('<?= base_url()?>home/del-dialog/' + id)
 						.dialog({
-							width   : 500,
+							width   : 'auto',
 							position: 'top',
 							modal   : true,
+							title   : "Delete Data",
 							buttons : [{
 									text: "Delete",
 									click: function () {
@@ -336,6 +336,101 @@
 				} else {
 					alert('No selected row.')
 				}
+			}
+		});
+
+		//btn update
+		$('#jqGrid').navButtonAdd('#jqGridPager', {
+			caption: "",
+			buttonicon: "ui-icon-pencil",
+			position: "first",
+			title: "Add",
+			onClickButton: function () {
+				var id = $("#jqGrid").jqGrid('getGridParam', "selrow");
+				$("#Dialog")
+				.load('<?= base_url()?>home/upd-dialog/'+id)
+				.dialog({
+					width   : 'auto',
+					position: 'top',
+					modal   : true,
+					title   : "Update Data",
+					buttons : [{
+							text: "Save",
+							click: function () {
+								var data = $('#updateForm').serialize()
+								$.ajax({
+									type: "POST",
+									url: "<?= base_url() ?>home/update/"+id,
+									data: data,
+									dataType: "text",
+									success: function (resultData) {
+										// console.log(resultData)
+									}
+								});
+								$(this).dialog('close');
+								$("#jqGrid").jqGrid('setGridParam', {
+									datatype: 'json',
+									postData: {
+										filters: []
+									},
+									search: false,
+								}).trigger('reloadGrid');
+							}
+						},
+						{
+							text: "Cancel",
+							click: function () {
+								$(this).dialog('close');
+							}
+						}
+					]
+				});
+			}
+		});
+
+		//btn add
+		$('#jqGrid').navButtonAdd('#jqGridPager', {
+			caption: "",
+			buttonicon: "ui-icon-plus",
+			position: "first",
+			title: "Add",
+			onClickButton: function () {
+				$("#Dialog")
+				.load('<?= base_url()?>home/add-dialog')
+				.dialog({
+					width   : 'auto',
+					position: 'top',
+					modal   : true,
+					title   : "Add Data",
+					buttons : [{
+							text: "Submit",
+							click: function () {
+								var data = $('#addForm').serialize()
+								$.ajax({
+									type: "POST",
+									url: "<?= base_url() ?>home/store",
+									data: data,
+									dataType: "text",
+									success: function (resultData) {}
+								});
+								$(this).dialog('close');
+								$("#jqGrid").jqGrid('setGridParam', {
+									datatype: 'json',
+									postData: {
+										filters: []
+									},
+									search: false,
+								}).trigger('reloadGrid');
+							}
+						},
+						{
+							text: "Cancel",
+							click: function () {
+								$(this).dialog('close');
+							}
+						}
+					]
+				});
 			}
 		});
 	});

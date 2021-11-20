@@ -34,33 +34,23 @@ class Global_M extends CI_Model {
 
 	public function add($data)
 	{
-		$form = [
-			'nama' => $data['nama'],
-			'nik' => $data['nik'],
-			'hp' => $data['hp'],
-			'email' => $data['email'],
-			'alamat' => $data['alamat']
-		];
+		$this->db->insert($this->tb_pelanggan, $data);
+		$id = $this->db->insert_id();
 
-		$this->db->insert($this->tb_pelanggan, $form);
+		return $id;
 	}
 
 	public function update($id, $data)
 	{
-		$form = [
-			'nama' => $data['nama'],
-			'nik' => $data['nik'],
-			'hp' => $data['hp'],
-			'email' => $data['email'],
-			'alamat' => $data['alamat']
-		];
-
 		$this->db->where('id', $id);
-		$this->db->update($this->tb_pelanggan, $form);
+		$this->db->update($this->tb_pelanggan, $data);
 	}
 
 	public function delete($id)
 	{
+		$this->db->where('pelanggan_id', $id);
+		$this->db->delete($this->tb_pesanan);
+
 		$this->db->where('id', $id);
 		$this->db->delete($this->tb_pelanggan);
 	}
@@ -90,8 +80,16 @@ class Global_M extends CI_Model {
 	public function get_all_pesanan($pelanggan_id)
 	{
 		$this->db->where('pelanggan_id', $pelanggan_id);
+		$this->db->order_by('id', 'ASC');
 		$query = $this->db->get($this->tb_pesanan);
 		return $query->result();
+	}
+
+	public function addPesanan($data)
+	{
+		$this->db->insert($this->tb_pesanan, $data);
+		
+		return true;
 	}
 
 	public function sum_total_harga($pelanggan_id)
@@ -109,6 +107,12 @@ class Global_M extends CI_Model {
 		];
 
 		return $data;
+	}
+
+	public function deletePesanan($pelanggan_id)
+	{
+		$this->db->where('pelanggan_id', $pelanggan_id);
+		$this->db->delete($this->tb_pesanan);
 	}
 
 }

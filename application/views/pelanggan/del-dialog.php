@@ -1,41 +1,79 @@
-<form name="FormPost" id="FrmGrid_jqGrid" class="FormGrid" onsubmit="return false;" style="width:auto;height:auto;">
-	<div class="FormError ui-state-error" style="display:none;"></div>
-	<div class="tinfo topinfo"></div>
-	<table id="TblGrid_jqGrid" class="EditTable ui-common-table">
+<form>
+	<table width="100%" cellspacing="0" id="customerData" style="font-size: 15px;">
+		<tr>
+			<td>
+				<label>Nama Lengkap</label>
+			</td>
+			<td>
+				<input type="text" id="nama" name="nama" value="<?= $pelanggan->nama ?>" readonly
+					class="FormElement ui-widget-content ui-corner-all">
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<label>NIK</label>
+			</td>
+			<td>
+				<input type="text" id="nik" name="nik" value="<?= $pelanggan->nik ?>" readonly
+					class="FormElement ui-widget-content ui-corner-all">
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<label>Handphone</label>
+			</td>
+			<td>
+				<input type="text" id="hp" name="hp" value="<?= $pelanggan->hp ?>" readonly
+					class="FormElement ui-widget-content ui-corner-all">
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<label>Email</label>
+			</td>
+			<td>
+				<input type="text" id="email" name="email" value="<?= $pelanggan->email ?>" readonly
+					class="FormElement ui-widget-content ui-corner-all">
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<label>Alamat</label>
+			</td>
+			<td>
+				<textarea type="text" id="alamat" name="alamat" readonly
+					class="FormElement ui-widget-content ui-corner-all"><?= $pelanggan->alamat ?></textarea>
+			</td>
+		</tr>
+	</table>
+	
+	<br>
+
+	<table width="100%" class="table ui-state-default" id="masterDetail" cellpadding="5" cellspacing="0" style="font-size: 15px;">
+		<thead>
+			<tr>
+				<th>Nama Produk</th>
+				<th>Harga</th>
+				<th>Qty</th>
+			</tr>
+		</thead>
 		<tbody>
-			<tr rowpos="1" class="FormData" id="tr_nama">
-				<td class="CaptionTD"><label for="nama">Nama Lengkap</label></td>
-				<td class="DataTD"><input type="text" role="textbox" value="<?= $pelanggan->nama ?>" readonly id="nama" name="nama" rowid="_empty" module="form"
-						checkupdate="false" size="20" class="FormElement ui-widget-content ui-corner-all"></td>
-			</tr>
-			<tr rowpos="2" class="FormData" id="tr_nik">
-				<td class="CaptionTD"><label for="nik">NIK</label></td>
-				<td class="DataTD"><input type="number" role="textbox" value="<?= $pelanggan->nik ?>" readonly id="nik" name="nik" rowid="_empty" module="form"
-						checkupdate="false" size="20" class="FormElement ui-widget-content ui-corner-all"></td>
-			</tr>
-			<tr rowpos="3" class="FormData" id="tr_hp">
-				<td class="CaptionTD"><label for="hp">Handphone</label></td>
-				<td class="DataTD"><input type="text" role="textbox" value="<?= $pelanggan->hp ?>" id="hp" name="hp" rowid="_empty" module="form"
-						checkupdate="false" size="20" class="FormElement ui-widget-content ui-corner-all"></td>
-			</tr>
-			<tr rowpos="4" class="FormData" id="tr_email">
-				<td class="CaptionTD"><label for="email">Email</label></td>
-				<td class="DataTD"><input type="text" role="textbox" value="<?= $pelanggan->email ?>" readonly id="email" name="email" rowid="_empty"
-						module="form" checkupdate="false" size="20" class="FormElement ui-widget-content ui-corner-all">
+			<?php foreach($pesanan as $pesan): ?>
+			<tr>
+				<td>
+					<input type="text" name="nama_produk[]" value="<?= $pesan->nama_produk ?>" readonly id="nama_produk" class="FormElement ui-widget-content ui-corner-all" required
+						autocomplete="off">
+				</td>
+				<td>
+					<input type="text" name="harga[]" value="<?= $pesan->harga ?>" id="harga" readonly class="FormElement ui-widget-content ui-corner-all im-currency"
+						required autocomplete="off">
+				</td>
+				<td>
+					<input type="text" name="qty[]" value="<?= $pesan->qty ?>" id="qty" readonly class="FormElement ui-widget-content ui-corner-all im-numeric"
+						required autocomplete="off">
 				</td>
 			</tr>
-			<tr rowpos="5" class="FormData" id="tr_alamat">
-				<td class="CaptionTD"><label for="alamat">Alamat</label></td>
-				<td class="DataTD"><textarea role="textbox" multiline="true" id="alamat" name="alamat" rowid="_empty"
-						module="form" checkupdate="false" cols="20" rows="2"
-						class="FormElement ui-widget-content ui-corner-all" readonly><?= $pelanggan->alamat ?></textarea></td>
-			</tr>
-			<tr class="FormData" style="display:none">
-				<td class="CaptionTD"></td>
-				<td colspan="1" class="DataTD"><input class="FormElement" id="id_g" type="text" name="jqGrid_id"
-						value="_empty"></td>
-			</tr>
+			<?php endforeach; ?>
 		</tbody>
 	</table>
-	<div class="binfo topinfo bottominfo"></div>
 </form>

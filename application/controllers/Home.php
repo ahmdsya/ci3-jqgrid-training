@@ -65,31 +65,88 @@ class Home extends CI_Controller {
 		echo json_encode($data);
 	}
 
-	public function get_by_id($id)
+	public function add_dialog()
+	{
+		$this->load->view('pelanggan/add-dialog');
+	}
+
+	public function upd_dialog($id){
+		$data['pelanggan'] = $this->m->getById($id);
+		$data['pesanan']   = $this->m->get_all_pesanan($data['pelanggan']->id);
+
+		$this->load->view('pelanggan/upd-dialog', $data);
+	}
+
+	public function del_dialog($id)
 	{
 		$data['pelanggan'] = $this->m->getById($id);
+		$data['pesanan']   = $this->m->get_all_pesanan($data['pelanggan']->id);
+		
 		$this->load->view('pelanggan/del-dialog', $data);
 	}
 
-	public function editurl()
+	public function store()
 	{
-		$id = $this->input->post('jqGrid_id');
-		$data = [
+		$dataPelanggan = [
 			'nama'   => $this->input->post('nama'),
 			'nik'    => $this->input->post('nik'),
 			'hp'     => $this->input->post('hp'),
 			'email'  => $this->input->post('email'),
-			'alamat' => $this->input->post('alamat')
+			'alamat' => $this->input->post('alamat'),
+		];
+		
+
+		$nama_produk = $this->input->post('nama_produk');
+		$harga       = $this->input->post('harga');
+		$qty         = $this->input->post('qty');
+
+		$pelanggan_id = $this->m->add($dataPelanggan);
+
+		for ($i=0; $i < count($nama_produk); $i++) { 
+			$dataPesanan = [
+				'pelanggan_id' => $pelanggan_id,
+				'nama_produk'  => $nama_produk[$i],
+				'harga'        => $harga[$i],
+				'qty'          => $qty[$i],
+				'total_harga'  => $harga[$i] * $qty[$i],
+			];
+
+			$this->m->addPesanan($dataPesanan);
+		}
+
+		return true;
+	}
+
+	public function update($id){
+		$dataPelanggan = [
+			'nama'   => $this->input->post('nama'),
+			'nik'    => $this->input->post('nik'),
+			'hp'     => $this->input->post('hp'),
+			'email'  => $this->input->post('email'),
+			'alamat' => $this->input->post('alamat'),
 		];
 
-		$count = $this->m->cek($id);
+		//update data pelanggan
+		$this->m->update($id, $dataPelanggan);
 
-		if($count >= 1){
-			//update data
-			$this->m->update($id, $data);
-		}else{
-			//add data
-			$this->m->add($data);
+		//delete data pesanan
+		$this->m->deletePesanan($id);
+
+		//insert data pesanan baru
+		$nama_produk = $this->input->post('nama_produk');
+		$harga       = $this->input->post('harga');
+		$qty         = $this->input->post('qty');
+
+		for ($i=0; $i < count($nama_produk); $i++) { 
+			$dataPesanan = [
+				'pelanggan_id' => $id,
+				'nama_produk'  => $nama_produk[$i],
+				'harga'        => $harga[$i],
+				'qty'          => $qty[$i],
+				'total_harga'  => $harga[$i] * $qty[$i],
+			];
+
+			$this->m->addPesanan($dataPesanan);
 		}
 
 		return true;
@@ -101,7 +158,6 @@ class Home extends CI_Controller {
 		$this->m->delete($id);
 		
 		return true;
-		// return json_encode($_POST);
 	}
 
 	
