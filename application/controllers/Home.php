@@ -7,6 +7,7 @@ class Home extends CI_Controller {
 	{
 		parent::__construct();
 		$this->load->model('Global_M','m');
+		$this->load->library('form_validation');
 	}
 
 	public function index()
@@ -87,69 +88,109 @@ class Home extends CI_Controller {
 
 	public function store()
 	{
-		$dataPelanggan = [
-			'nama'   => $this->input->post('nama'),
-			'nik'    => $this->input->post('nik'),
-			'hp'     => $this->input->post('hp'),
-			'email'  => $this->input->post('email'),
-			'alamat' => $this->input->post('alamat'),
-		];
-		
+		$this->form_validation->set_rules('nama', 'nama', 'required');
+		$this->form_validation->set_rules('nik', 'nik', 'required|numeric');
+		$this->form_validation->set_rules('hp', 'hp', 'required|numeric');
+		$this->form_validation->set_rules('email', 'email', 'required|valid_email');
+		$this->form_validation->set_rules('alamat', 'alamat', 'required');
 
-		$nama_produk = $this->input->post('nama_produk');
-		$harga       = $this->input->post('harga');
-		$qty         = $this->input->post('qty');
-
-		$pelanggan_id = $this->m->add($dataPelanggan);
-
-		for ($i=0; $i < count($nama_produk); $i++) { 
-			$dataPesanan = [
-				'pelanggan_id' => $pelanggan_id,
-				'nama_produk'  => $nama_produk[$i],
-				'harga'        => $harga[$i],
-				'qty'          => $qty[$i],
-				'total_harga'  => $harga[$i] * $qty[$i],
+		if ($this->form_validation->run() == FALSE) {
+			echo json_encode([
+				'status' => 'error',
+				'msg' => validation_errors()
+			]);
+		}else{
+			$dataPelanggan = [
+				'nama'   => $this->input->post('nama'),
+				'nik'    => $this->input->post('nik'),
+				'hp'     => $this->input->post('hp'),
+				'email'  => $this->input->post('email'),
+				'alamat' => $this->input->post('alamat'),
 			];
+			
 
-			$this->m->addPesanan($dataPesanan);
+			$nama_produk = $this->input->post('nama_produk');
+			$harga       = $this->input->post('harga');
+			$qty         = $this->input->post('qty');
+
+			$pelanggan_id = $this->m->add($dataPelanggan);
+
+			for ($i=0; $i < count($nama_produk); $i++) { 
+				$dataPesanan = [
+					'pelanggan_id' => $pelanggan_id,
+					'nama_produk'  => $nama_produk[$i],
+					'harga'        => $harga[$i],
+					'qty'          => $qty[$i],
+					'total_harga'  => $harga[$i] * $qty[$i],
+				];
+
+				$this->m->addPesanan($dataPesanan);
+			}
+
+			//delete data pesanan yang kosong
+			$this->db->where('nama_produk', '');
+			$this->db->delete('pesanan');
+
+			echo json_encode([
+				'status' => 'success',
+			]);
 		}
-
-		return true;
+		
 	}
 
 	public function update($id){
-		$dataPelanggan = [
-			'nama'   => $this->input->post('nama'),
-			'nik'    => $this->input->post('nik'),
-			'hp'     => $this->input->post('hp'),
-			'email'  => $this->input->post('email'),
-			'alamat' => $this->input->post('alamat'),
-		];
 
-		//update data pelanggan
-		$this->m->update($id, $dataPelanggan);
+		$this->form_validation->set_rules('nama', 'nama', 'required');
+		$this->form_validation->set_rules('nik', 'nik', 'required|numeric');
+		$this->form_validation->set_rules('hp', 'hp', 'required|numeric');
+		$this->form_validation->set_rules('email', 'email', 'required|valid_email');
+		$this->form_validation->set_rules('alamat', 'alamat', 'required');
 
-		//delete data pesanan
-		$this->m->deletePesanan($id);
-
-		//insert data pesanan baru
-		$nama_produk = $this->input->post('nama_produk');
-		$harga       = $this->input->post('harga');
-		$qty         = $this->input->post('qty');
-
-		for ($i=0; $i < count($nama_produk); $i++) { 
-			$dataPesanan = [
-				'pelanggan_id' => $id,
-				'nama_produk'  => $nama_produk[$i],
-				'harga'        => $harga[$i],
-				'qty'          => $qty[$i],
-				'total_harga'  => $harga[$i] * $qty[$i],
+		if ($this->form_validation->run() == FALSE) {
+			echo json_encode([
+				'status' => 'error',
+				'msg' => validation_errors()
+			]);
+		}else{
+			$dataPelanggan = [
+				'nama'   => $this->input->post('nama'),
+				'nik'    => $this->input->post('nik'),
+				'hp'     => $this->input->post('hp'),
+				'email'  => $this->input->post('email'),
+				'alamat' => $this->input->post('alamat'),
 			];
-
-			$this->m->addPesanan($dataPesanan);
+	
+			//update data pelanggan
+			$this->m->update($id, $dataPelanggan);
+	
+			//delete data pesanan
+			$this->m->deletePesanan($id);
+	
+			//insert data pesanan baru
+			$nama_produk = $this->input->post('nama_produk');
+			$harga       = $this->input->post('harga');
+			$qty         = $this->input->post('qty');
+	
+			for ($i=0; $i < count($nama_produk); $i++) { 
+				$dataPesanan = [
+					'pelanggan_id' => $id,
+					'nama_produk'  => $nama_produk[$i],
+					'harga'        => $harga[$i],
+					'qty'          => $qty[$i],
+					'total_harga'  => $harga[$i] * $qty[$i],
+				];
+	
+				$this->m->addPesanan($dataPesanan);
+			}
+	
+			//delete data pesanan yang kosong
+			$this->db->where('nama_produk', '');
+			$this->db->delete('pesanan');
+	
+			echo json_encode([
+				'status' => 'success',
+			]);
 		}
-
-		return true;
 	}
 
 	public function delete()

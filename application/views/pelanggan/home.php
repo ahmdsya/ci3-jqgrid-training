@@ -159,8 +159,6 @@
 			pager: "#jqGridPager",
 		});
 
-		// $("#jqGrid").jqGrid('bindKeys');
-
 		//master detail
 		var pelanggan_id = $("#jqGrid").jqGrid('getGridParam', "selrow");
 		$("#jqGridDetails").jqGrid({
@@ -324,18 +322,26 @@
 										url: "<?= base_url() ?>home/update/"+id,
 										data: data,
 										dataType: "text",
-										success: function (resultData) {
-											// console.log(resultData)
+										success: function (result) {
+											var res = JSON.parse(result)
+											if(res.status == 'error'){
+												$('#addForm').before(`
+													<div id="errorBox" class="ui-state-error" style="font-size:12px">
+														${res.msg}
+													</div>
+												`)
+											}else{
+												$("#Dialog").dialog('close');
+												$("#jqGrid").jqGrid('setGridParam', {
+													datatype: 'json',
+													postData: {
+														filters: []
+													},
+													search: false,
+												}).trigger('reloadGrid');
+											}
 										}
 									});
-									$(this).dialog('close');
-									$("#jqGrid").jqGrid('setGridParam', {
-										datatype: 'json',
-										postData: {
-											filters: []
-										},
-										search: false,
-									}).trigger('reloadGrid');
 								}
 							},
 							{
@@ -375,16 +381,26 @@
 									url: "<?= base_url() ?>home/store",
 									data: data,
 									dataType: "text",
-									success: function (resultData) {}
+									success: function (result) {
+										var res = JSON.parse(result)
+										if(res.status == 'error'){
+											$('#addForm').before(`
+												<div id="errorBox" class="ui-state-error" style="font-size:12px">
+													${res.msg}
+												</div>
+											`)
+										}else{
+											$("#Dialog").dialog('close');
+											$("#jqGrid").jqGrid('setGridParam', {
+												datatype: 'json',
+												postData: {
+													filters: []
+												},
+												search: false,
+											}).trigger('reloadGrid');
+										}
+									}
 								});
-								$(this).dialog('close');
-								$("#jqGrid").jqGrid('setGridParam', {
-									datatype: 'json',
-									postData: {
-										filters: []
-									},
-									search: false,
-								}).trigger('reloadGrid');
 							}
 						},
 						{
