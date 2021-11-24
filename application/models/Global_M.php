@@ -16,7 +16,7 @@ class Global_M extends CI_Model {
 	//table pelanggan
 	public function get_data($start, $limit, $where, $sidx, $sord)
 	{
-		$this->db->select('id,nama,nik,hp,email,alamat');
+		$this->db->select('id,tgl_pesanan,nama,nik,hp,email,alamat');
 		$this->db->order_by($sidx, $sord);
 		if($where != NULL)$this->db->where($where,NULL,FALSE);
 		$query = $this->db->get($this->tb_pelanggan, $limit, $start);
@@ -103,7 +103,7 @@ class Global_M extends CI_Model {
 			'nama_produk' => '',
 			'harga'       => '',
 			'qty'         => 'Total',
-			'total_harga' => $total
+			'total_harga' => "Rp. ".number_format($total,2, ".",".")
 		];
 
 		return $data;

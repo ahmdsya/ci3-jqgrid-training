@@ -2,6 +2,14 @@
 	<table width="100%" cellspacing="0" style="font-size: 15px;">
 		<tr>
 			<td>
+				<label>Tanggal Pesanan</label>
+			</td>
+			<td>
+				<input type="text" id="tgl_pesanan" name="tgl_pesanan" class="FormElement ui-widget-content ui-corner-all hasDatePicker" required autocomplete="off" maxlength="10">
+			</td>
+		</tr>
+		<tr>
+			<td>
 				<label>Nama Lengkap</label>
 			</td>
 			<td>
@@ -78,7 +86,7 @@
 			<tr>
 				<td colspan="3"></td>
 				<td>
-					<a href="javascript:" onclick="addRow();">
+					<a href="javascript:" onclick="addRow(); setNumericFormat();">
 						<span class="ui-icon ui-icon-plus"></span>
 					</a>
 				</td>
@@ -88,6 +96,11 @@
 </form>
 
 <script type="text/javascript">
+
+	$(document).ready(function() {
+		setDateFormat()
+		setNumericFormat()
+	})
 
     function addRow() {
 		$('#masterDetail tbody tr').last().before(`
@@ -108,5 +121,56 @@
 				</td>
 			</tr>
 		`)
+	}
+
+	function setDateFormat() {
+		//date format
+		$('.hasDatePicker').datepicker({
+			dateFormat: 'd-m-yy',
+			yearRange: '2000:2099'
+		}).inputmask({
+			inputFormat: "dd-mm-yyyy",
+			alias: "datetime",
+			minYear: '01-01-2000'
+		})
+		.focusout(function(e) {
+			let val = $(this).val()
+			if (val.match('[a-zA-Z]') == null) {
+				if (val.length == 8) {
+					$(this).inputmask({
+						inputFormat: "dd-mm-yyyy",
+					}).val([val.slice(0, 6), '20', val.slice(6)].join(''))
+				}
+			} else {
+				$(this).focus()
+			}
+		})
+		.focus(function() {
+			let val = $(this).val()
+			if (val.length == 10) {
+				$(this).inputmask({
+					inputFormat: 'dd-mm-yyyy',
+				}).val([val.slice(0, 6), '', val.slice(8)].join(''))
+			}
+		})
+	}
+
+	function setNumericFormat() {
+		//numeric format
+		$('.im-numeric').keypress(function(e){
+			if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+			  return false;
+			}
+		})
+
+		//currency format
+		$('.im-currency').inputmask('integer', {
+			alias: 'numeric',
+			groupSeparator: '.',
+			autoGroup: true,
+			digitsOptional: false,
+			allowMinus: false,
+			placeholder: '',
+		})
 	}
 </script>

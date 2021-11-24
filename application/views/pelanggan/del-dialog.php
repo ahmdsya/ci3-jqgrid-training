@@ -2,6 +2,17 @@
 	<table width="100%" cellspacing="0" id="customerData" style="font-size: 15px;">
 		<tr>
 			<td>
+				<label>Tanggal Pesanan</label>
+			</td>
+			<td>
+				<input type="text" id="tgl_pesanan" name="tgl_pesanan"
+					value="<?= date('d-m-Y', strtotime($pelanggan->tgl_pesanan)) ?>"
+					class="FormElement ui-widget-content ui-corner-all hasDatePicker"
+					required autocomplete="off" maxlength="10" readonly>
+			</td>
+		</tr>
+		<tr>
+			<td>
 				<label>Nama Lengkap</label>
 			</td>
 			<td>

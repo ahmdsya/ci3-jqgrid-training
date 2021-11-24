@@ -18,9 +18,6 @@
 					<div id="jqGridPagerDetails"></div>
 
 					<div class="mt-2">
-						<!-- <input type="button" value="Select row  with ID 1" onclick="selectRow()" /> -->
-						<!-- <button id="exportExcel" class="btn btn-sm btn-success">Export To Excel</button>
-						<button id="exportPDF" class="btn btn-sm btn-warning">Export To PDF</button> -->
 					</div>
 				</div>
 			</div>
@@ -32,14 +29,6 @@
 	
 	$(document).ready(function () {
 
-		// var template = "<div style='margin-left:15px;'><div> Nama Lengkap <sup>*</sup>:</div><div> {nama} </div>";
-		// template += "<div> NIK: </div><div>{nik} </div>";
-		// template += "<div> Phone: </div><div>{hp} </div>";
-		// template += "<div> Email: </div><div>{email} </div>";
-		// template += "<div> Alamat:</div><div> {alamat} </div>";
-		// template += "<hr style='width:100%;'/>";
-		// template += "<div> {sData} {cData}  </div></div>";
-
 		$("#jqGrid").jqGrid({
 			url: '<?= base_url() ?>home/get-data',
 			editurl: 'clientArray',
@@ -49,13 +38,20 @@
 				{
 					label: 'ID',
 					name: 'id',
-					key: true,
 					width: 30,
 					editable: false,
-					hidden:true,
-					searchoptions: {
-						sopt: ["in", "ni", "ge", "le", "eq"]
-					}
+					hidden: true,
+					key: true,
+				},
+				{
+					label: 'Tgl Pesanan',
+					name: 'tgl_pesanan',
+					width: 70,
+					editable: true,
+					formatter: 'date',
+					formatoptions: {
+						newformat:'d-m-Y'
+					},
 				},
 				{
 					label: 'Nama Lengkap',
@@ -168,9 +164,9 @@
             page: 1,
 			colModel: [
                     { label: 'Nama Produk', name: 'nama_produk', width: 100 },
-                    { label: 'Harga', name: 'harga', width: 75 },
+                    { label: 'Harga', name: 'harga', width: 75, formatter:'currency', formatoptions:{thousandsSeparator: ".", prefix: "Rp. "}},
                     { label: 'Kuantitas', name: 'qty', width: 50 },
-                    { label: 'Total Harga', name: 'total_harga', width: 75 },
+                    { label: 'Total Harga', name: 'total_harga', width: 75, formatter:'currency', formatoptions:{thousandsSeparator: ".", prefix: "Rp. "}},
 			],
 			width: 780,
 			rowNum: 10,
@@ -243,6 +239,51 @@
 				},
 				search: false,
 			}).trigger('reloadGrid');
+		});
+
+
+		//btn report
+		$('#jqGrid').navButtonAdd('#jqGridPager', {
+			caption: "",
+			title: "Report",
+			buttonicon: "ui-icon-document",
+			position: "first",
+			onClickButton: function () {
+				$('#Dialog').html(`
+					<div class="ui-state-default" style="padding: 5px;">
+						<h5> Tentukan Baris </h5>
+						
+						<label> Dari: </label>
+						<input type="number" min="1" name="start" value="${$(this).getInd($(this).getGridParam('selrow'))}" class="ui-widget-content ui-corner-all autonumeric" style="padding: 5px; text-transform: uppercase;" required>
+
+						<label> Sampai: </label>
+						<input type="number" name="limit" value="${$(this).getGridParam('records')}" class="ui-widget-content ui-corner-all autonumeric" style="padding: 5px; text-transform: uppercase;" required>
+					</div>
+				`)
+				.dialog({
+					width   : 'auto',
+					position: 'top',
+					modal   : true,
+					title   : "Report",
+					buttons : [
+						{
+							text: "Report",
+							click: function () {
+								let start = $(this).find('input[name=start]').val()
+								let limit = $(this).find('input[name=limit]').val()
+
+								console.log('Start: '+start+', Limit: '+limit)
+							}
+						},
+						{
+							text: "Cancel",
+							click: function () {
+								$(this).dialog('close');
+							}
+						}
+					]
+				});
+			}
 		});
 
 		//btn delete
@@ -376,6 +417,7 @@
 							text: "Submit",
 							click: function () {
 								var data = $('#addForm').serialize()
+								console.log(data)
 								$.ajax({
 									type: "POST",
 									url: "<?= base_url() ?>home/store",

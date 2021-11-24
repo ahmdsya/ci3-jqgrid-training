@@ -58,8 +58,8 @@ class Home extends CI_Controller {
 		    
 		$i = 0;
 		foreach($result as $row) {
-			$data['rows'][$i]['id']=$row->id;
-			$data['rows'][$i]['cell']=array($row->id, $row->nama, $row->nik, $row->hp, $row->email, $row->alamat);
+			// $data['rows'][$i]['id']=$row->id;
+			$data['rows'][$i]['cell']=array( $row->id,$row->tgl_pesanan,$row->nama, $row->nik, $row->hp, $row->email, $row->alamat);
 			$i++;
 		}
 		
@@ -88,11 +88,13 @@ class Home extends CI_Controller {
 
 	public function store()
 	{
+		$this->form_validation->set_rules('tgl_pesanan', 'tgl pesanan', 'required');
 		$this->form_validation->set_rules('nama', 'nama', 'required');
 		$this->form_validation->set_rules('nik', 'nik', 'required|numeric');
 		$this->form_validation->set_rules('hp', 'hp', 'required|numeric');
 		$this->form_validation->set_rules('email', 'email', 'required|valid_email');
 		$this->form_validation->set_rules('alamat', 'alamat', 'required');
+		
 
 		if ($this->form_validation->run() == FALSE) {
 			echo json_encode([
@@ -101,13 +103,13 @@ class Home extends CI_Controller {
 			]);
 		}else{
 			$dataPelanggan = [
-				'nama'   => $this->input->post('nama'),
-				'nik'    => $this->input->post('nik'),
-				'hp'     => $this->input->post('hp'),
-				'email'  => $this->input->post('email'),
-				'alamat' => $this->input->post('alamat'),
+				'tgl_pesanan' => date('Y-m-d', strtotime($this->input->post('tgl_pesanan'))),
+				'nama'        => $this->input->post('nama'),
+				'nik'         => $this->input->post('nik'),
+				'hp'          => $this->input->post('hp'),
+				'email'       => $this->input->post('email'),
+				'alamat'      => $this->input->post('alamat'),
 			];
-			
 
 			$nama_produk = $this->input->post('nama_produk');
 			$harga       = $this->input->post('harga');
@@ -119,9 +121,9 @@ class Home extends CI_Controller {
 				$dataPesanan = [
 					'pelanggan_id' => $pelanggan_id,
 					'nama_produk'  => $nama_produk[$i],
-					'harga'        => $harga[$i],
+					'harga'        => str_replace('.', '', $harga[$i]),
 					'qty'          => $qty[$i],
-					'total_harga'  => $harga[$i] * $qty[$i],
+					'total_harga'  => str_replace('.', '', $harga[$i]) * $qty[$i],
 				];
 
 				$this->m->addPesanan($dataPesanan);
@@ -140,6 +142,7 @@ class Home extends CI_Controller {
 
 	public function update($id){
 
+		$this->form_validation->set_rules('tgl_pesanan', 'tgl pesanan', 'required');
 		$this->form_validation->set_rules('nama', 'nama', 'required');
 		$this->form_validation->set_rules('nik', 'nik', 'required|numeric');
 		$this->form_validation->set_rules('hp', 'hp', 'required|numeric');
@@ -153,11 +156,12 @@ class Home extends CI_Controller {
 			]);
 		}else{
 			$dataPelanggan = [
-				'nama'   => $this->input->post('nama'),
-				'nik'    => $this->input->post('nik'),
-				'hp'     => $this->input->post('hp'),
-				'email'  => $this->input->post('email'),
-				'alamat' => $this->input->post('alamat'),
+				'tgl_pesanan' => date('Y-m-d', strtotime($this->input->post('tgl_pesanan'))),
+				'nama'        => $this->input->post('nama'),
+				'nik'         => $this->input->post('nik'),
+				'hp'          => $this->input->post('hp'),
+				'email'       => $this->input->post('email'),
+				'alamat'      => $this->input->post('alamat'),
 			];
 	
 			//update data pelanggan
@@ -175,9 +179,9 @@ class Home extends CI_Controller {
 				$dataPesanan = [
 					'pelanggan_id' => $id,
 					'nama_produk'  => $nama_produk[$i],
-					'harga'        => $harga[$i],
+					'harga'        => str_replace('.', '', $harga[$i]),
 					'qty'          => $qty[$i],
-					'total_harga'  => $harga[$i] * $qty[$i],
+					'total_harga'  => str_replace('.', '', $harga[$i]) * $qty[$i],
 				];
 	
 				$this->m->addPesanan($dataPesanan);

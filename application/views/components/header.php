@@ -15,6 +15,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     <script src="<?= base_url() ?>assets/jqGrid/js/trirand/jquery.jqGrid.min.js"></script>
     <script src="<?= base_url() ?>assets/jqGrid/js/trirand/i18n/grid.locale-en.js"></script>
     <script src="<?= base_url() ?>assets/jqGrid/js/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.6/jquery.inputmask.min.js"></script>
     
     <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"> 
     <link rel="stylesheet" type="text/css" href="<?= base_url() ?>assets/jqGrid/css/trirand/ui.jqgrid-bootstrap.css" />
