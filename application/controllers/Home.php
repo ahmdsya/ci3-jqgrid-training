@@ -223,4 +223,17 @@ class Home extends CI_Controller {
 
 		// echo $pelanggan_id;
 	}
+
+	public function test()
+	{
+		$this->db->select('id,tgl_pesanan,nama,nik,hp,email,alamat');
+		$data['dataPelanggan'] = $this->db->get('pelanggan')->result();
+
+		foreach($data['dataPelanggan'] as $pelanggan){
+			$pelanggan->relations = $this->db->get_where('pesanan', ['pesanan.pelanggan_id' => $pelanggan->id])->result();
+		}
+
+		$this->load->view('pelanggan/report', $data);
+		// echo json_encode($data['dataPelanggan']);
+	}
 }
