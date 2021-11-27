@@ -207,15 +207,31 @@ class Home extends CI_Controller {
 
 	public function report()
 	{
-		$start = ( $_GET['start'] - 1) ?? 0;
-		$limit =  $_GET['limit'] - $start;
+		$start   = ($_GET['start'] - 1) ?? 0;
+		$limit   = $_GET['limit'] - $start;
+		$getData = json_decode(base64_decode($_GET['data']));
+		$myData  = array_slice($getData, $start, $limit);
+		$sidx    = isset($_GET['sidx'])?$_GET['sidx']:'id';
+		$sord    = isset($_GET['sord'])?$_GET['sord']:'';
 
+		$pelangganID = [];
+
+		foreach($myData as $data){
+			$pelangganID[] = (int)$data->id;
+		}
+		
 		$this->db->select('id,tgl_pesanan,nama,nik,hp,email,alamat');
-		$data['dataPelanggan'] = $this->db->get('pelanggan',$limit, $start)->result();
+		$this->db->where_in('id', $pelangganID);
+		$this->db->order_by($sidx, $sord);
+		$dataPelanggan = $this->db->get('pelanggan')->result();
 
-		foreach($data['dataPelanggan'] as $pelanggan){
+		foreach($dataPelanggan as $pelanggan){
 			$pelanggan->relations = $this->db->get_where('pesanan', ['pesanan.pelanggan_id' => $pelanggan->id])->result();
 		}
+
+		$data = [
+			'dataPelanggan' => $dataPelanggan
+		];
 
 		$this->load->view('pelanggan/report', $data);
 		// echo json_encode($data['dataPelanggan']);

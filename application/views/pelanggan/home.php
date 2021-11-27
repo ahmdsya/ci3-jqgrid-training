@@ -273,11 +273,13 @@
 								let start = $(this).find('input[name=start]').val()
 								let limit = $(this).find('input[name=limit]').val()
 
-								var myData = $('#jqGrid').jqGrid('getRowData');
+								var sidx = $("#jqGrid").jqGrid('getGridParam','sortname');
+								var sord = $("#jqGrid").jqGrid('getGridParam','sortorder');
 
-								console.log(myData)
+								var getData = $('#jqGrid').jqGrid('getRowData');
+								var data    = window.btoa(JSON.stringify(getData)); //base64 encode
 
-								// window.open('<?= base_url() ?>home/report?start='+start+'&limit='+limit)
+								window.open('<?= base_url() ?>home/report?start='+start+'&limit='+limit+'&sidx='+sidx+'&sord='+sord+'&data='+data)
 							}
 						},
 						{
