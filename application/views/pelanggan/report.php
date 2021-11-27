@@ -3,7 +3,7 @@
 <head>
 
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-  <title>Customer Order</title>
+  <title>Report Pelanggan - Pesanan</title>
   <link rel="stylesheet" type="text/css" href="<?= base_url('assets/stimulsoft-report/2021.3.6/css/stimulsoft.viewer.office2013.whiteblue.css') ?>">
   <link rel="stylesheet" type="text/css" href="<?= base_url('assets/stimulsoft-report/2021.3.6/css/stimulsoft.designer.office2013.whiteblue.css') ?>">
   <script type="text/javascript" src="<?= base_url('assets/stimulsoft-report/2021.3.6/scripts/stimulsoft.reports.js') ?>"></script>
@@ -35,7 +35,7 @@
 
       report.regData(dataSet.dataSetName, '', dataSet)
       report.dictionary.synchronize()
-      report.pages.getByIndex(0).margins = new Stimulsoft.Report.Components.StiMargins(0.5, 0.5, 0.5, 0.5) /*(last printed)*/
+      report.pages.getByIndex(0).margins = new Stimulsoft.Report.Components.StiMargins(0.5, 0.5, 0.5, 0.5)
 
       viewer.report = report
 

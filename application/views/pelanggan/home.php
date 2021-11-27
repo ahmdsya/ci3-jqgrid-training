@@ -231,6 +231,7 @@
 			document.getElementById('gs_hp').value     = '';
 			document.getElementById('gs_email').value  = '';
 			document.getElementById('gs_alamat').value = '';
+			document.getElementById('gs_tgl_pesanan').value = '';
 			document.getElementById('keyword').value   = '';
 			$("#jqGrid").jqGrid('setGridParam', {
 				datatype: 'json',
@@ -272,7 +273,11 @@
 								let start = $(this).find('input[name=start]').val()
 								let limit = $(this).find('input[name=limit]').val()
 
-								console.log('Start: '+start+', Limit: '+limit)
+								var myData = $('#jqGrid').jqGrid('getRowData');
+
+								console.log(myData)
+
+								// window.open('<?= base_url() ?>home/report?start='+start+'&limit='+limit)
 							}
 						},
 						{

@@ -205,6 +205,22 @@ class Home extends CI_Controller {
 		return true;
 	}
 
+	public function report()
+	{
+		$start = ( $_GET['start'] - 1) ?? 0;
+		$limit =  $_GET['limit'] - $start;
+
+		$this->db->select('id,tgl_pesanan,nama,nik,hp,email,alamat');
+		$data['dataPelanggan'] = $this->db->get('pelanggan',$limit, $start)->result();
+
+		foreach($data['dataPelanggan'] as $pelanggan){
+			$pelanggan->relations = $this->db->get_where('pesanan', ['pesanan.pelanggan_id' => $pelanggan->id])->result();
+		}
+
+		$this->load->view('pelanggan/report', $data);
+		// echo json_encode($data['dataPelanggan']);
+	}
+
 	
 	//proses untuk tabel pesanan
 	public function get_all_pesanan()
@@ -226,14 +242,6 @@ class Home extends CI_Controller {
 
 	public function test()
 	{
-		$this->db->select('id,tgl_pesanan,nama,nik,hp,email,alamat');
-		$data['dataPelanggan'] = $this->db->get('pelanggan')->result();
-
-		foreach($data['dataPelanggan'] as $pelanggan){
-			$pelanggan->relations = $this->db->get_where('pesanan', ['pesanan.pelanggan_id' => $pelanggan->id])->result();
-		}
-
-		$this->load->view('pelanggan/report', $data);
-		// echo json_encode($data['dataPelanggan']);
+		
 	}
 }
