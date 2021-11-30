@@ -38,16 +38,16 @@
 				{
 					label: 'ID',
 					name: 'id',
-					width: 30,
-					editable: false,
+					width: 20,
+					// editable: false,
 					hidden: true,
 					key: true,
 				},
 				{
 					label: 'Tgl Pesanan',
 					name: 'tgl_pesanan',
-					width: 70,
-					editable: true,
+					width: 40,
+					// editable: true,
 					formatter: 'date',
 					formatoptions: {
 						newformat:'d-m-Y'
@@ -56,12 +56,12 @@
 				{
 					label: 'Nama Lengkap',
 					name: 'nama',
-					width: 70,
-					editable: true,
-					editrules: {
-						required: true,
-						placeholder: "Nama Lengkap"
-					},
+					width: 60,
+					// editable: true,
+					// editrules: {
+						// required: true,
+						// placeholder: "Nama Lengkap"
+					// },
 					searchoptions: {
 						sopt: ["in", "ni", "ge", "le", "eq"]
 					}
@@ -69,13 +69,13 @@
 				{
 					label: 'NIK',
 					name: 'nik',
-					width: 70,
-					editable: true,
+					width: 50,
+					// editable: true,
 					edittype: 'number',
-					editrules: {
-						required: true,
-						placeholder: "Nama Lengkap"
-					},
+					// editrules: {
+						// required: true,
+						// placeholder: "Nama Lengkap"
+					// },
 					searchoptions: {
 						sopt: ["in", "ni", "ge", "le", "eq"]
 					}
@@ -83,12 +83,12 @@
 				{
 					label: 'Handphone',
 					name: 'hp',
-					width: 90,
-					editable: true,
-					editrules: {
-						pattern: "^[0-9\-\+\s\(\)]*$",
-						required: true
-					},
+					width: 50,
+					// editable: true,
+					// editrules: {
+						// pattern: "^[0-9\-\+\s\(\)]*$",
+						// required: true
+					// },
 					searchoptions: {
 						sopt: ["in", "ni", "ge", "le", "eq"]
 					}
@@ -96,12 +96,12 @@
 				{
 					label: 'Email',
 					name: 'email',
-					width: 100,
-					editable: true,
-					editrules: {
-						email: true,
-						required: true
-					},
+					width: 80,
+					// editable: true,
+					// editrules: {
+					// 	email: true,
+					// 	required: true
+					// },
 					searchoptions: {
 						sopt: ["in", "ni", "ge", "le", "eq"]
 					}
@@ -109,12 +109,12 @@
 				{
 					label: 'Alamat',
 					name: 'alamat',
-					width: 80,
-					editable: true,
-					edittype: 'textarea',
-					editrules: {
-						required: true
-					},
+					width: 120,
+					// editable: true,
+					// edittype: 'textarea',
+					// editrules: {
+					// 	required: true
+					// },
 					searchoptions: {
 						sopt: ["in", "ni", "ge", "le", "eq"]
 					}
@@ -144,7 +144,7 @@
 				}					
 			},
 			viewrecords: true, // show the current page, data rang and total records on the toolbar
-			width: 780,
+			width: '1300',
 			height: 'auto',
 			rowNum: 10,
 			rowList: [10, 20, 30],
@@ -164,9 +164,9 @@
             page: 1,
 			colModel: [
                     { label: 'Nama Produk', name: 'nama_produk', width: 100 },
-                    { label: 'Harga', name: 'harga', width: 75, formatter:'currency', formatoptions:{thousandsSeparator: ".", prefix: "Rp. "}},
-                    { label: 'Kuantitas', name: 'qty', width: 50 },
-                    { label: 'Total Harga', name: 'total_harga', width: 75, formatter:'currency', formatoptions:{thousandsSeparator: ".", prefix: "Rp. "}},
+                    { label: 'Harga', name: 'harga', width: 75, align: "right", formatter:'currency', formatoptions:{thousandsSeparator: ".", prefix: "Rp. "}},
+                    { label: 'Kuantitas', name: 'qty', width: 50, align: "right" },
+                    { label: 'Total Harga', name: 'total_harga', width: 75, align: "right", formatter:'currency', formatoptions:{thousandsSeparator: ".", prefix: "Rp. "}},
 			],
 			width: 780,
 			rowNum: 10,
@@ -268,10 +268,14 @@
 					title   : "Report",
 					buttons : [
 						{
-							text: "Report",
+							text: "StimulSoft",
 							click: function () {
 								let start = $(this).find('input[name=start]').val()
 								let limit = $(this).find('input[name=limit]').val()
+
+								if (parseInt(start) > parseInt(limit)) {
+									return alert('Nilai "Sampai" harus lebih besar')
+								}
 
 								var sidx = $("#jqGrid").jqGrid('getGridParam','sortname');
 								var sord = $("#jqGrid").jqGrid('getGridParam','sortorder');
@@ -279,7 +283,27 @@
 								var getData = $('#jqGrid').jqGrid('getRowData');
 								var data    = window.btoa(JSON.stringify(getData)); //base64 encode
 
-								window.open('<?= base_url() ?>home/report?start='+start+'&limit='+limit+'&sidx='+sidx+'&sord='+sord+'&data='+data)
+								window.open('<?= base_url() ?>home/report?data='+data+'&start='+start+'&limit='+limit+'&sidx='+sidx+'&sord='+sord+'&type=stimulsoft')
+							}
+						},
+						{
+							text: "Excel",
+							click: function() {
+								// console.log('Excel')
+								let start = $(this).find('input[name=start]').val()
+								let limit = $(this).find('input[name=limit]').val()
+
+								if (parseInt(start) > parseInt(limit)) {
+									return alert('Nilai "Sampai" harus lebih besar')
+								}
+
+								var sidx = $("#jqGrid").jqGrid('getGridParam','sortname');
+								var sord = $("#jqGrid").jqGrid('getGridParam','sortorder');
+
+								var getData = $('#jqGrid').jqGrid('getRowData');
+								var data    = window.btoa(JSON.stringify(getData)); //base64 encode
+
+								window.open('<?= base_url() ?>home/report?data='+data+'&start='+start+'&limit='+limit+'&sidx='+sidx+'&sord='+sord+'&type=excel')
 							}
 						},
 						{
@@ -424,7 +448,6 @@
 							text: "Submit",
 							click: function () {
 								var data = $('#addForm').serialize()
-								console.log(data)
 								$.ajax({
 									type: "POST",
 									url: "<?= base_url() ?>home/store",

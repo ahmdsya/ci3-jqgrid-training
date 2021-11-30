@@ -1,5 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class Home extends CI_Controller {
 
@@ -21,7 +23,7 @@ class Home extends CI_Controller {
 	{
 		$page  = $_GET['page'];
 		$limit = $_GET['rows'];
-		$sidx  = isset($_GET['sidx'])?$_GET['sidx']:'id';  //field index
+		$sidx  = ($_GET['sidx'] == "" ? 'nama' : $_GET['sidx']);  //field index
 		$sord  = isset($_GET['sord'])?$_GET['sord']:'';    // default = asc
 
 		$search  = (isset($_GET['_search']) ? $_GET['_search'] : false);
@@ -45,7 +47,7 @@ class Home extends CI_Controller {
         }
 				
 		$start = $limit*$page - $limit;
-		$start = ($start<0)?0:$start;
+		// $start = ($start<0)?0:$start;
 		
 		$model  = $this->m->get_data($start, $limit, $where, $sidx, $sord);
 		$result = $model->result();
@@ -55,11 +57,18 @@ class Home extends CI_Controller {
 		$data['page']    = $page;
 		$data['total']   = ceil($rowcnt/$limit);
 		$data['records'] = $rowcnt;
+		// $data['rows']    = $result;
 		    
 		$i = 0;
 		foreach($result as $row) {
 			// $data['rows'][$i]['id']=$row->id;
-			$data['rows'][$i]['cell']=array( $row->id,$row->tgl_pesanan,$row->nama, $row->nik, $row->hp, $row->email, $row->alamat);
+			$data['rows'][$i]['cell']=array( 
+								$row->id,
+								$row->tgl_pesanan,
+								strtoupper($row->nama), 
+								$row->nik, $row->hp, 
+								strtoupper($row->email), 
+								strtoupper($row->alamat));
 			$i++;
 		}
 		
@@ -211,8 +220,9 @@ class Home extends CI_Controller {
 		$limit   = $_GET['limit'] - $start;
 		$getData = json_decode(base64_decode($_GET['data']));
 		$myData  = array_slice($getData, $start, $limit);
-		$sidx    = isset($_GET['sidx'])?$_GET['sidx']:'id';
+		$sidx    = isset($_GET['sidx'])?$_GET['sidx']:'nama';
 		$sord    = isset($_GET['sord'])?$_GET['sord']:'';
+		$type    = isset($_GET['type'])?$_GET['type']:false;
 
 		$pelangganID = [];
 
@@ -233,8 +243,46 @@ class Home extends CI_Controller {
 			'dataPelanggan' => $dataPelanggan
 		];
 
-		$this->load->view('pelanggan/report', $data);
-		// echo json_encode($data['dataPelanggan']);
+		if($type == "stimulsoft"){
+
+			$this->load->view('pelanggan/report', $data);
+
+		}elseif($type == "excel"){
+
+			$spreadsheet = new Spreadsheet();
+			$sheet = $spreadsheet->getActiveSheet();
+
+			$sheet->setCellValue('A1', 'NO');
+			$sheet->setCellValue('B1', 'Tanggal Pesanan');
+			$sheet->setCellValue('C1', 'Nama Lengkap');
+			$sheet->setCellValue('D1', 'NIK');
+			$sheet->setCellValue('E1', 'HP');
+			$sheet->setCellValue('F1', 'Email');
+			$sheet->setCellValue('G1', 'Alamat');
+
+			$no  = 1;
+			$col = 2;
+
+			foreach($data['dataPelanggan'] as $row){
+				$sheet->setCellValue('A'.$col, $no++);
+				$sheet->setCellValue('B'.$col, $row->tgl_pesanan);
+				$sheet->setCellValue('C'.$col, $row->nama);
+				$sheet->setCellValue('D'.$col, $row->nik);
+				$sheet->setCellValue('E'.$col, $row->hp);
+				$sheet->setCellValue('F'.$col, $row->email);
+				$sheet->setCellValue('G'.$col, $row->alamat);
+				$col++;
+			}
+
+			$writer = new Xlsx($spreadsheet);
+			$filename = 'Report';
+			
+			header('Content-Type: application/vnd.ms-excel');
+			header('Content-Disposition: attachment;filename="'. $filename .'.xlsx"'); 
+			header('Cache-Control: max-age=0');
+	
+			$writer->save('php://output');
+		}
 	}
 
 	
@@ -259,5 +307,50 @@ class Home extends CI_Controller {
 	public function test()
 	{
 		
+	}
+
+	public function dummy()
+	{
+		for ($i=0; $i < 100000; $i++) { 
+
+			$faker = Faker\Factory::create('id_ID');
+			// $faker::setDefaultTimezone('Asia/Jakarta');
+
+			$dataPelanggan = [
+				'tgl_pesanan' => $faker->date($format = 'Y-m-d', $max = 'now'),
+				'nama' => $faker->name,
+				'nik' => rand(),
+				'hp' => $faker->e164PhoneNumber,
+				'email' => $faker->email,
+				'alamat' => $faker->address
+			];
+	
+			$pelanggan_id = $this->m->add($dataPelanggan);
+			
+			for ($j=1; $j < 4; $j++) { 
+
+				$harga = rand ( 10000 , 99999 );
+
+				$dataPesanan = [
+					'pelanggan_id' => $pelanggan_id,
+					'nama_produk' => "Produk $j",
+					'harga' => $harga,
+					'qty' => $j,
+					'total_harga' => $harga*$j
+				];
+
+				$this->m->addPesanan($dataPesanan);
+			}
+		}
+
+		echo "OK";
+	}
+
+	public function trancate()
+	{
+		$this->db->truncate('pelanggan');
+		$this->db->truncate('pesanan');
+
+		echo "OK";
 	}
 }

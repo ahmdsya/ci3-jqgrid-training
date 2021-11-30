@@ -32,6 +32,12 @@ class Global_M extends CI_Model {
 		return $query->num_rows();
 	}
 
+	public function all_count()
+	{
+		// $this->db->order_by('id', 'acs');
+		return $this->db->get($this->tb_pelanggan)->num_rows();
+	}
+
 	public function add($data)
 	{
 		$this->db->insert($this->tb_pelanggan, $data);
@@ -60,13 +66,6 @@ class Global_M extends CI_Model {
 		$this->db->where('id', $id);
 		$query = $this->db->get($this->tb_pelanggan);
 		return $query->row();
-	}
-
-	public function all_count()
-	{
-		$this->db->order_by('id', 'DESC');
-		$query = $this->db->get($this->tb_pelanggan);
-		return $query->num_rows();
 	}
 
 	public function cek($id)
